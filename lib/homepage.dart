@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'widgets/task_tile.dart';
+import 'widgets/categories.dart';
+import 'widgets/bottom_navigation.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -8,18 +11,22 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  final List<String> _tasks = []; // List to store tasks
+  final List<String> _tasks = [];
+  final List<bool> _taskCompletion = []; // Track task completion state
+  String _selectedCategory = 'All';
+  int _currentIndex = 1;
 
   void _addTask(String task) {
     setState(() {
-      _tasks.add(task); // Add new task to the list
+      _tasks.add(task);
+      _taskCompletion.add(false); // New task is initially unchecked
     });
-    Navigator.pop(context); // Close the bottom sheet after adding task
+    Navigator.pop(context);
   }
 
   void _editTask(int index, String newTask) {
     setState(() {
-      _tasks[index] = newTask; // Update the task
+      _tasks[index] = newTask;
     });
     Navigator.pop(context);
   }
@@ -33,15 +40,16 @@ class _HomepageState extends State<Homepage> {
           content: const Text("Are you sure you want to delete this task?"),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context), // Cancel deletion
+              onPressed: () => Navigator.pop(context),
               child: const Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
                 setState(() {
-                  _tasks.removeAt(index); // Remove the task from the list
+                  _tasks.removeAt(index);
+                  _taskCompletion.removeAt(index);
                 });
-                Navigator.pop(context); // Close dialog
+                Navigator.pop(context);
               },
               child: const Text("Delete", style: TextStyle(color: Colors.red)),
             ),
@@ -55,7 +63,7 @@ class _HomepageState extends State<Homepage> {
     TextEditingController taskController = TextEditingController();
 
     if (index != null) {
-      taskController.text = _tasks[index]; // Pre-fill if editing
+      taskController.text = _tasks[index];
     }
 
     showModalBottomSheet(
@@ -68,13 +76,18 @@ class _HomepageState extends State<Homepage> {
             children: [
               Text(
                 index == null ? 'Enter New Task' : 'Edit Task',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: taskController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide:
+                        const BorderSide(color: Colors.deepPurple, width: 1),
+                  ),
                   labelText: 'Task Name',
                 ),
               ),
@@ -89,6 +102,16 @@ class _HomepageState extends State<Homepage> {
                     }
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  elevation: 5,
+                ),
                 child: Text(index == null ? 'Add Task' : 'Update Task'),
               ),
             ],
@@ -98,63 +121,86 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('All Tasks')),
-      body: _tasks.isEmpty
-          ? const Center(child: Text('No tasks added yet!'))
-          : ListView.builder(
-        itemCount: _tasks.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.deepPurple, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: const Offset(2, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      _tasks[index],
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _showTaskBottomSheet(index: index),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteTask(index), // Show confirmation box
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+      appBar: AppBar(
+        backgroundColor:
+            Theme.of(context).colorScheme.inversePrimary.withOpacity(0.75),
+        title: const Text(
+          'Tasks',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 1.5,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back
+          },
+        ),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          // Add the TaskCategories widget
+          Center(
+            child: TaskCategories(
+              onCategorySelected: (category) {
+                setState(() {
+                  _selectedCategory = category;
+                  // Here you can filter tasks based on the selected category
+                });
+              },
             ),
-          );
-        },
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+
+            child: _tasks.isEmpty
+
+                ? const Center(child: Text('No tasks added yet!'))
+
+                : ListView.builder(
+
+                    itemCount: _tasks.length,
+                    itemBuilder: (context, index) {
+                      const SizedBox(height: 20);
+                      return TaskTile(
+                        task: _tasks[index],
+                        isChecked: _taskCompletion[index],
+                        onEdit: () => _showTaskBottomSheet(index: index),
+                        onDelete: () => _deleteTask(index),
+                        onCheckboxChanged: (bool? value) {
+                          setState(() {
+                            _taskCompletion[index] = value!;
+                          });
+                        },
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
+
         onPressed: () => _showTaskBottomSheet(),
         tooltip: 'Add Task',
         child: const Icon(Icons.add),
+      ),
+      bottomNavigationBar: BottomNavigation(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped, // Handle tab changes here
       ),
     );
   }
