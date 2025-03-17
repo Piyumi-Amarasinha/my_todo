@@ -15,7 +15,12 @@ Mark as Completed: Keep track of progress by marking tasks as done.
 State Management: Efficiently managed task state for a smooth user experience.
 
 # Technologies Used
-Frontend: Flutter
+
+C++
+Dart
+Flutter
+CMake
+Swift
 
 ## Getting Started
 
