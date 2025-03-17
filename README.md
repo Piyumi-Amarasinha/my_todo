@@ -8,11 +8,12 @@ Here’s my Portfolio Demo:
 ![My - Portfolio](https://github.com/Piyumi-Amarasinha/my_todo/blob/0e77c232fced83209921f6f6e123c5a2a2e8751a/My-Todo-demo.jpg)
 
 # Key Features
-Create Tasks: Add new tasks with a simple and intuitive UI.
-Update Tasks: Edit task details efficiently.
-Delete Tasks: Remove completed or unnecessary tasks.
-Mark as Completed: Keep track of progress by marking tasks as done.
-State Management: Efficiently managed task state for a smooth user experience.
+
+- **Create Tasks:** Add new tasks with a simple and intuitive UI.  
+- **Update Tasks:** Edit task details efficiently.  
+- **Delete Tasks:** Remove completed or unnecessary tasks.  
+- **Mark as Completed:** Keep track of progress by marking tasks as done.  
+- **State Management:** Efficiently managed task state for a smooth user experience.  
 
 # Technologies Used
 
