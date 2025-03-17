@@ -16,11 +16,11 @@ State Management: Efficiently managed task state for a smooth user experience.
 
 # Technologies Used
 
-C++
-Dart
-Flutter
-CMake
-Swift
+- C++  
+- Dart  
+- Flutter  
+- CMake  
+- Swift  
 
 ## Getting Started
 
