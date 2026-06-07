@@ -1,120 +1,75 @@
 import 'package:flutter/material.dart';
 
-class TaskCategories extends StatefulWidget {
+class TaskCategories extends StatelessWidget {
+  final String selectedCategory;
   final Function(String) onCategorySelected;
 
-  const TaskCategories({
-    Key? key,
-    required this.onCategorySelected,
-  }) : super(key: key);
-
-  @override
-  State<TaskCategories> createState() => _TaskCategoriesState();
-}
-
-class _TaskCategoriesState extends State<TaskCategories> {
-  String _selectedCategory = 'All';
-
-  final List<String> _categories = [
+  static const List<String> categories = [
     'All',
     'Work',
     'Personal',
     'Wishlist',
+    'Other',
   ];
+
+  const TaskCategories({
+    super.key,
+    required this.selectedCategory,
+    required this.onCategorySelected,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 15),
+    return SizedBox(
+      height: 38,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: _categories.length,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: categories.length,
         itemBuilder: (context, index) {
-          final category = _categories[index];
-          final isSelected = category == _selectedCategory;
+          final category = categories[index];
+          final isSelected = category == selectedCategory;
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.only(right: 8),
             child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedCategory = category;
-                });
-                widget.onCategorySelected(category);
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              onTap: () => onCategorySelected(category),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? Color(0xFFB39DDB) : Colors.deepPurple,
-                  borderRadius: BorderRadius.circular(25),
+                  color: isSelected ? Colors.deepPurple : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected
+                        ? Colors.deepPurple
+                        : Colors.deepPurple.withValues(alpha: 0.25),
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: Colors.deepPurple.withValues(alpha: 0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : [],
                 ),
-                alignment: Alignment.center,
                 child: Text(
                   category,
                   style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                    color:
+                        isSelected ? Colors.white : Colors.deepPurple.shade700,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontSize: 13,
                   ),
                 ),
               ),
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-// Example usage in your main screen:
-class TaskScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Tasks'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_vert),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          TaskCategories(
-            onCategorySelected: (category) {
-              // Handle category selection here
-              print('Selected category: $category');
-              // Filter tasks based on selected category
-            },
-          ),
-          // Rest of your task list UI
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(0xFFF48FB1),
-        onPressed: () {
-          // Handle adding new task
-        },
-        child: Icon(Icons.add),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Tasks',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Mine',
-          ),
-        ],
       ),
     );
   }
